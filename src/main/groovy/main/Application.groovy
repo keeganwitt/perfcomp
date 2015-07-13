@@ -1,8 +1,6 @@
 package main
 
-import groovy.transform.CompileStatic
-import groovyx.gbench.BenchmarkBuilder
-
+import groovyx.gprof.Profiler
 import perfcomp.java.Child as JChild
 import perfcomp.java.Dog as JDog
 import perfcomp.java.Parent as JParent
@@ -14,32 +12,36 @@ import perfcomp.groovy.Child as GChild
 import perfcomp.groovy.Dog as GDog
 import perfcomp.groovy.Parent as GParent
 import perfcomp.groovy.Person as GPerson
-import perfcomp.groovy.StaticChild as GSChild
-import perfcomp.groovy.StaticDog as GSDog
-import perfcomp.groovy.StaticParent as GSParent
-import perfcomp.groovy.StaticPerson as GSPerson
 
 import static perfcomp.groovy.Util.printName as gPrintName
-import static perfcomp.groovy.StaticUtil.printName as gsPrintName
 
 /**
  * Created by rahul on 7/10/15.
  */
 class Application {
+
+    public static final int LOOP_SIZE = 300
+
+    @SuppressWarnings("UnnecessaryQualifiedReference")
     public static void main(String[] args) {
 
-        new BenchmarkBuilder().run {
-            'JApplication.java' {JApplication.java(300)}
-            'JApplication.groovy' {JApplication.groovy(300)}
-            'Application.java' {Application.java(300)}
-            'Application.javaStatic' {Application.javaStatic(300)}
-            'Application.groovy' {Application.groovy(300)}
-            'Application.groovyStatic' {Application.groovyStatic(300)}
+        benchmark {
+            'JApplication.java' {JApplication.java(LOOP_SIZE)}
+            'Application.java' {Application.java(LOOP_SIZE)}
+            'GApplication.javaStatic' {GApplication.javaStatic(LOOP_SIZE)}
+            'Application.groovy' {Application.groovy(LOOP_SIZE)}
+            'GApplication.groovyStatic' {GApplication.groovyStatic(LOOP_SIZE)}
         }.prettyPrint()
 
+        new Profiler().run ({
+            GApplication.javaStatic(300)
+        }).prettyPrint()
+        new Profiler().run ({
+            JApplication.java(300)
+        }).prettyPrint()
     }
 
-    private static void java(int count) {
+    public static void java(int count) {
 
         // Create new Parent and Child objects but use Person type reference.
         JPerson parent1 = new JParent('parent1')
@@ -65,33 +67,7 @@ class Application {
             assert 'printName(p): buck' == jPrintName(new JDog('buck'))
         }
     }
-    @CompileStatic
-    private static void javaStatic(int count) {
 
-        // Create new Parent and Child objects but use Person type reference.
-        JPerson parent1 = new JParent('parent1')
-        JPerson child1 = new JChild('child1')
-        count.times {
-            assert 'printName(Person): parent1' == jPrintName(parent1)
-            assert 'printName(Child): child1' == jPrintName(child1)  // This is not what Java would do!!
-            assert 'printName(Person): child1' == jPrintName(child1 as JPerson)
-            // Same as what Java would do with printName(child1)
-        }
-
-        // Create objects with type reference is equal to object.
-        JParent parent2 = new JParent('parent2')
-        JChild child2 = new JChild('child2')
-
-        count.times {
-            assert 'printName(Person): parent2' == jPrintName(parent2)
-            assert 'printName(Child): child2' == jPrintName(child2)
-        }
-
-        // Use class outside Person hierarchy.
-        count.times {
-            assert 'printName(p): buck' == jPrintName(new JDog('buck'))
-        }
-    }
     private static void groovy(int count) {
 
         // Create new Parent and Child objects but use Person type reference.
@@ -118,31 +94,6 @@ class Application {
             assert 'printName(p): buck' == gPrintName(new GDog('buck'))
         }
     }
-    @CompileStatic
-    private static void groovyStatic(int count) {
 
-        // Create new Parent and Child objects but use Person type reference.
-        GSPerson parent1 = new GSParent('parent1')
-        GSPerson child1 = new GSChild('child1')
-        count.times {
-            assert 'printName(StaticPerson): parent1' == gsPrintName(parent1)
-            assert 'printName(StaticChild): child1' == gsPrintName(child1)  // This is not what Java would do!!
-            assert 'printName(StaticPerson): child1' == gsPrintName(child1 as GSPerson)
-            // Same as what Java would do with printName(child1)
-        }
 
-        // Create objects with type reference is equal to object.
-        GSParent parent2 = new GSParent('parent2')
-        GSChild child2 = new GSChild('child2')
-
-        count.times {
-            assert 'printName(StaticPerson): parent2' == gsPrintName(parent2)
-            assert 'printName(StaticChild): child2' == gsPrintName(child2)
-        }
-
-        // Use class outside Person hierarchy.
-        count.times {
-            assert 'printName(StaticDog): buck' == gsPrintName(new GSDog('buck'))
-        }
-    }
 }
