@@ -1,5 +1,6 @@
 package main
 
+import groovy.transform.CompileStatic
 import groovyx.gprof.Profiler
 import perfcomp.java.Child as JChild
 import perfcomp.java.Dog as JDog
@@ -41,12 +42,13 @@ class Application {
         }).prettyPrint()
     }
 
+    @CompileStatic
     public static void java(int count) {
 
         // Create new Parent and Child objects but use Person type reference.
         JPerson parent1 = new JParent('parent1')
         JPerson child1 = new JChild('child1')
-        count.times {
+        for (int i = 0; i < count; i++) {
             assert 'printName(Person): parent1' == jPrintName(parent1)
             assert 'printName(Child): child1' == jPrintName(child1)  // This is not what Java would do!!
             assert 'printName(Person): child1' == jPrintName(child1 as JPerson)
@@ -57,13 +59,13 @@ class Application {
         JParent parent2 = new JParent('parent2')
         JChild child2 = new JChild('child2')
 
-        count.times {
+        for (int i = 0; i < count; i++) {
             assert 'printName(Person): parent2' == jPrintName(parent2)
             assert 'printName(Child): child2' == jPrintName(child2)
         }
 
         // Use class outside Person hierarchy.
-        count.times {
+        for (int i = 0; i < count; i++) {
             assert 'printName(p): buck' == jPrintName(new JDog('buck'))
         }
     }
@@ -73,7 +75,7 @@ class Application {
         // Create new Parent and Child objects but use Person type reference.
         GPerson parent1 = new GParent('parent1')
         GPerson child1 = new GChild('child1')
-        count.times {
+        for (int i = 0; i < count; i++) {
             assert 'printName(Person): parent1' == gPrintName(parent1)
             assert 'printName(Child): child1' == gPrintName(child1)  // This is not what Java would do!!
             assert 'printName(Person): child1' == gPrintName(child1 as GPerson)
@@ -84,13 +86,13 @@ class Application {
         GParent parent2 = new GParent('parent2')
         GChild child2 = new GChild('child2')
 
-        count.times {
+        for (int i = 0; i < count; i++) {
             assert 'printName(Person): parent2' == gPrintName(parent2)
             assert 'printName(Child): child2' == gPrintName(child2)
         }
 
         // Use class outside Person hierarchy.
-        count.times {
+        for (int i = 0; i < count; i++) {
             assert 'printName(p): buck' == gPrintName(new GDog('buck'))
         }
     }
