@@ -1,6 +1,7 @@
 package main
 
 import groovy.transform.CompileStatic
+import groovyx.gbench.BenchmarkBuilder
 import groovyx.gprof.Profiler
 import perfcomp.java.Child as JChild
 import perfcomp.java.Dog as JDog
@@ -26,7 +27,7 @@ class Application {
     @SuppressWarnings("UnnecessaryQualifiedReference")
     public static void main(String[] args) {
 
-        benchmark {
+        new BenchmarkBuilder().run {
             'JApplication.java' {JApplication.java(LOOP_SIZE)}
             'Application.java' {Application.java(LOOP_SIZE)}
             'GApplication.javaStatic' {GApplication.javaStatic(LOOP_SIZE)}
