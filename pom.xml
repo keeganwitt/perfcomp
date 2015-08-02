@@ -36,6 +36,9 @@
         <groupId>org.codehaus.gmavenplus</groupId>
         <artifactId>gmavenplus-plugin</artifactId>
         <version>1.5</version>
+        <configuration>
+          <invokeDynamic>true</invokeDynamic>
+        </configuration>
         <executions>
           <execution>
             <goals>
